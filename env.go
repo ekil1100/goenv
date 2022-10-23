@@ -11,7 +11,7 @@ type Env struct {
 	Keys []string          // to keep the order of the keys
 }
 
-func Filter(list []string, fn func(string) bool) (result []string) {
+func filter(list []string, fn func(string) bool) (result []string) {
 	for _, item := range list {
 		if fn(item) {
 			result = append(result, item)
@@ -30,7 +30,7 @@ func (env *Env) String() string {
 }
 
 func (env *Env) Add(key, value string) {
-	env.Keys = Filter(env.Keys, func(k string) bool {
+	env.Keys = filter(env.Keys, func(k string) bool {
 		return k != key
 	})
 	env.Keys = append(env.Keys, key)
