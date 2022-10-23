@@ -5,7 +5,24 @@
 - [x] load `.env` file
 - [x] support string syntax
 - [x] nested variables using `${}` syntax
-- [ ] set default value using `:=` and `:-`
+- [x] set default value using `:=` and `:-`
+
+## Usage
+
+```go
+package main
+
+import (
+  "github.com/ekil1100/go.env"
+)
+
+func init() {
+  env.Load()
+}
+
+func main() {
+}
+```
 
 ## Reference
 

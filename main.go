@@ -39,12 +39,15 @@ func (env *Env) Parser(data []byte) {
 			panic(fmt.Sprintf("Line %d: `%s` is not a valid environment variable\n", lineNumber+1, line))
 		}
 
+		// split key and value and store into a map
 		parts := strings.SplitN(line, "=", 2)
 		key, value := strings.TrimSpace(parts[0]), strings.Trim(parts[1], `" `)
+		env.Keys = append(env.Keys, key)
 		env.Kv[key] = value
 	}
 
-	for key, value := range env.Kv {
+	for _, key := range env.Keys {
+		value := env.Kv[key]
 		env.Kv[key] = env.SolveNestedValues(value)
 	}
 }
@@ -101,7 +104,7 @@ func Load() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	env := &Env{Kv: make(map[string]string)}
+	env := &Env{Kv: make(map[string]string), Keys: make([]string, 0)}
 	env.Parser(data)
 	fmt.Println("Loading environment values from .env file:")
 	fmt.Println(env)
@@ -119,4 +122,5 @@ func init() {
 
 func main() {
 	fmt.Println("In main program:")
+	fmt.Println(os.Getenv("DATABASE_URL"))
 }
