@@ -1,4 +1,4 @@
-package main
+package env
 
 import (
 	"fmt"
@@ -59,7 +59,9 @@ func (env *Env) Parser(data []byte) {
 
 		// split key and value and store into a map
 		parts := strings.SplitN(line, "=", 2)
-		key, value := strings.TrimSpace(parts[0]), strings.Trim(parts[1], `" `)
+		key := strings.TrimSpace(parts[0])
+		value := strings.Split(parts[1], "#")[0]
+		value = strings.Trim(value, "\" ")
 		env.Add(key, value)
 	}
 
@@ -79,7 +81,6 @@ func (env *Env) SolveNestedValues(value string) string {
 
 			var key, defaultValue string
 			var replace, hasDefault bool
-			var replacer string
 
 			if len(spitedParameter) > 1 {
 				hasDefault = true
@@ -96,12 +97,11 @@ func (env *Env) SolveNestedValues(value string) string {
 				key = spitedParameter[0]
 			}
 
-			if hasDefault {
-				replacer = defaultValue
-			} else {
-				var ok bool
-				replacer, ok = env.Kv[key]
-				if !ok {
+			replacer, ok := env.Kv[key]
+			if !ok {
+				if hasDefault {
+					replacer = defaultValue
+				} else {
 					panic(fmt.Sprintf("Key %s not found in `%s`", key, value))
 				}
 			}
@@ -117,10 +117,10 @@ func (env *Env) SolveNestedValues(value string) string {
 	return value
 }
 
-func Load() {
+func Load() error {
 	data, err := os.ReadFile(".env")
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 	env := &Env{Kv: make(map[string]string), Keys: make([]string, 0)}
 	env.Parser(data)
@@ -129,16 +129,8 @@ func Load() {
 	for key, value := range env.Kv {
 		err := os.Setenv(key, value)
 		if err != nil {
-			panic(err)
+			return err
 		}
 	}
-}
-
-func init() {
-	Load()
-}
-
-func main() {
-	fmt.Println("In main program:")
-	fmt.Println(os.Getenv("DATABASE_URL"))
+	return nil
 }
