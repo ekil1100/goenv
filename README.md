@@ -1,18 +1,12 @@
 # go.env
 
-```bash
-echo "${var}"
-echo "Substitute the value of var."
+## Feature
 
-echo "${var:-word}"
-echo "If var is null or unset, word is substituted for var. The value of var does not change."
+- [x] load `.env` file
+- [x] support string syntax
+- [x] nested variables using `${}` syntax
+- [ ] set default value using `:=`
 
-echo "${var:=word}"
-echo "If var is null or unset, var is set to the value of word."
+## Reference
 
-echo "${var:?message}"
-echo "If var is null or unset, message is printed to standard error. This checks that variables are set correctly."
-
-echo "${var:+word}"
-echo "If var is set, word is substituted for var. The value of var does not change."
-```
+- https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
