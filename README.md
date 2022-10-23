@@ -1,11 +1,11 @@
 # go.env
 
-## Feature
+## Features
 
 - [x] load `.env` file
 - [x] support string syntax
 - [x] nested variables using `${}` syntax
-- [ ] set default value using `:=`
+- [ ] set default value using `:=` and `:-`
 
 ## Reference
 
