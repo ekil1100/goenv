@@ -7,6 +7,12 @@
 - [x] nested variables using `${}` syntax
 - [x] set default value using `:=` and `:-`
 
+## Install
+
+```shell
+go get github.com/ekil1100/goenv
+```
+
 ## Usage
 
 ```go
