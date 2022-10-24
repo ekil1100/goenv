@@ -98,7 +98,7 @@ func (env *Env) SolveNestedValues(value string) string {
 			}
 
 			replacer, ok := env.Kv[key]
-			if !ok {
+			if !ok || replacer == "" {
 				if hasDefault {
 					replacer = defaultValue
 				} else {

@@ -1,7 +1,6 @@
 package env
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -23,15 +22,24 @@ KEY2=${KEY}`), map[string]string{"KEY": "VALUE", "KEY2": "VALUE"}},
 KEY2=${KEY:-DEFAULT}`), map[string]string{"KEY": "VALUE", "KEY2": "VALUE"}},
 		"with nested value and default 2": {[]byte(`KEY=VALUE
 KEY2=${KEY3:-DEFAULT}`), map[string]string{"KEY": "VALUE", "KEY2": "DEFAULT"}},
+		"with nested value and default 3": {[]byte(`KEY=VALUE
+KEY2=${KEY3:DEFAULT}`), map[string]string{"KEY": "VALUE", "KEY2": "DEFAULT"}},
 		"with nested value and default and replace": {[]byte(`KEY=VALUE
 KEY2=${KEY3:=DEFAULT}`), map[string]string{"KEY": "VALUE", "KEY2": "DEFAULT", "KEY3": "DEFAULT"}},
+		"with nested value 2": {[]byte(`DB_USER=postgres
+DB_PASS=xyz
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=db
+DATABASE_URL="postgresql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}?pool_timeout=30&connection_limit=22"`), map[string]string{"DB_USER": "postgres", "DB_PASS": "xyz", "DB_HOST": "localhost", "DB_PORT": "5432", "DB_NAME": "db", "DATABASE_URL": "postgresql://postgres:xyz@localhost:5432/db?pool_timeout=30&connection_limit=22"}},
+		"default with null": {[]byte(`KEY=
+KEY2=${KEY:-DEFAULT}`), map[string]string{"KEY": "", "KEY2": "DEFAULT"}},
 	}
 
 	for name, test := range data {
 		t.Run(name, func(t *testing.T) {
 			env := &Env{Kv: make(map[string]string), Keys: make([]string, 0)}
 			env.Parser(test.input)
-			fmt.Println(env)
 			for key, value := range test.expected {
 				if env.Kv[key] != value {
 					t.Errorf("\nExpected -> %s\nGot -> %s", value, env.Kv[key])
