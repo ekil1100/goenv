@@ -9,6 +9,8 @@
 - [x] support inline comment
 - [x] nested variables using `${}` syntax
 - [x] set default value using `:=` and `:-`
+- [ ] Don't load the `.env` if it's not present
+- [ ] Support custom path to the `.env` file
 - [ ] load `.env.xxx` depends on `APP_ENV` value
 
 ## Install
