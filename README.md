@@ -12,8 +12,9 @@ Import environment variables from `.env` file.
 - [x] nested variables using `${}` syntax
 - [x] set default value using `:=` and `:-`
 - [x] Don't load the `.env` if it's not present
-- [ ] Support custom path to the `.env` file
+- [x] Support custom path to the `.env` file
 - [x] load `.env.xxx` depends on `APP_ENV` value
+- [ ] support multiple file inputs
 
 ## Install
 

@@ -1,6 +1,7 @@
 package env
 
 import (
+	"os"
 	"testing"
 )
 
@@ -51,18 +52,33 @@ KEY2=${KEY:-DEFAULT}`), map[string]string{"KEY": "", "KEY2": "DEFAULT"}},
 
 func TestLoad(t *testing.T) {
 	tests := []struct {
-		name   string
-		appEnv string
+		name     string
+		filename string
+		appEnv   string
+		expected map[string]string
 	}{
-		{name: "simple", appEnv: ""},
-		{name: "with app env", appEnv: "local"},
+		{name: "simple", expected: map[string]string{"ENV": "default"}},
+		{name: "with app env", appEnv: "local", expected: map[string]string{"ENV": "local"}},
+		{name: "with filename", filename: ".env.local", expected: map[string]string{"ENV": "local"}},
+		{name: "with app env and filename", appEnv: "local", filename: ".env.prod", expected: map[string]string{"ENV": "prod"}},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Setenv("APP_ENV", tt.appEnv)
-			if err := Load(); err != nil {
+			var err error
+			if tt.filename != "" {
+				err = Load(tt.filename)
+			} else {
+				err = Load()
+			}
+			if err != nil {
 				t.Errorf("Load() error = %v", err)
+			}
+			for k, v := range tt.expected {
+				if os.Getenv(k) != v {
+					t.Errorf("\nExpected -> %s=%s\nGot -> %s=%s", k, v, k, os.Getenv(k))
+				}
 			}
 		})
 	}

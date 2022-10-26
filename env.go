@@ -118,21 +118,22 @@ func (env *Env) SolveNestedValues(value string) string {
 	return value
 }
 
-func Load() error {
-	suffix := strings.ToLower(os.Getenv("APP_ENV"))
-	var filename string
-	if suffix != "" {
-		filename = ".env" + "." + suffix
-	} else {
-		filename = ".env"
+func Load(filenames ...string) error {
+	if len(filenames) == 0 {
+		suffix := strings.ToLower(os.Getenv("APP_ENV"))
+		if suffix != "" {
+			filenames = []string{".env" + "." + suffix}
+		} else {
+			filenames = []string{".env"}
+		}
 	}
-	data, err := os.ReadFile(filename)
+	data, err := os.ReadFile(filenames[0])
 	if err != nil {
 		log.Println(err)
 	}
 	env := &Env{Kv: make(map[string]string), Keys: make([]string, 0)}
 	env.Parser(data)
-	log.Printf("Loading environment values from %v file:", filename)
+	log.Printf("Loading environment values from %v:", filenames[0])
 	log.Println(env)
 	for key, value := range env.Kv {
 		err := os.Setenv(key, value)
