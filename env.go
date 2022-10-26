@@ -2,6 +2,7 @@ package env
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 )
@@ -118,14 +119,21 @@ func (env *Env) SolveNestedValues(value string) string {
 }
 
 func Load() error {
-	data, err := os.ReadFile(".env")
+	suffix := strings.ToLower(os.Getenv("APP_ENV"))
+	var filename string
+	if suffix != "" {
+		filename = ".env" + "." + suffix
+	} else {
+		filename = ".env"
+	}
+	data, err := os.ReadFile(filename)
 	if err != nil {
-		return err
+		log.Println(err)
 	}
 	env := &Env{Kv: make(map[string]string), Keys: make([]string, 0)}
 	env.Parser(data)
-	fmt.Println("Loading environment values from .env file:")
-	fmt.Println(env)
+	log.Printf("Loading environment values from %v file:", filename)
+	log.Println(env)
 	for key, value := range env.Kv {
 		err := os.Setenv(key, value)
 		if err != nil {
