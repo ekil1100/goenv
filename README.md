@@ -14,7 +14,7 @@ Import environment variables from `.env` file.
 - [x] Don't load the `.env` if it's not present
 - [x] Support custom path to the `.env` file
 - [x] load `.env.xxx` depends on `APP_ENV` value
-- [ ] support multiple file inputs
+- [x] support multiple file inputs
 
 ## Install
 

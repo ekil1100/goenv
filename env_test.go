@@ -52,23 +52,26 @@ KEY2=${KEY:-DEFAULT}`), map[string]string{"KEY": "", "KEY2": "DEFAULT"}},
 
 func TestLoad(t *testing.T) {
 	tests := []struct {
-		name     string
-		filename string
-		appEnv   string
-		expected map[string]string
+		name      string
+		filenames []string
+		appEnv    string
+		expected  map[string]string
 	}{
 		{name: "simple", expected: map[string]string{"ENV": "default"}},
 		{name: "with app env", appEnv: "local", expected: map[string]string{"ENV": "local"}},
-		{name: "with filename", filename: ".env.local", expected: map[string]string{"ENV": "local"}},
-		{name: "with app env and filename", appEnv: "local", filename: ".env.prod", expected: map[string]string{"ENV": "prod"}},
+		{name: "with filename", filenames: []string{".env.local"}, expected: map[string]string{"ENV": "local"}},
+		{name: "file not exist", filenames: []string{".env.dev"}, expected: map[string]string{}},
+		{name: "some file not exist", filenames: []string{".env.dev", ".env.local"}, expected: map[string]string{}},
+		{name: "with app env and filename", appEnv: "local", filenames: []string{".env.prod"}, expected: map[string]string{"KEY": "prod"}},
+		{name: "with multiple files", filenames: []string{".env.local", ".env.prod"}, expected: map[string]string{"ENV": "local", "KEY": "prod"}},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Setenv("APP_ENV", tt.appEnv)
 			var err error
-			if tt.filename != "" {
-				err = Load(tt.filename)
+			if len(tt.filenames) != 0 {
+				err = Load(tt.filenames...)
 			} else {
 				err = Load()
 			}

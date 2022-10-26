@@ -122,23 +122,34 @@ func Load(filenames ...string) error {
 	if len(filenames) == 0 {
 		suffix := strings.ToLower(os.Getenv("APP_ENV"))
 		if suffix != "" {
-			filenames = []string{".env" + "." + suffix}
+			filenames = append(filenames, ".env"+"."+suffix)
 		} else {
-			filenames = []string{".env"}
+			filenames = append(filenames, ".env")
 		}
 	}
-	data, err := os.ReadFile(filenames[0])
-	if err != nil {
-		log.Println(err)
-	}
-	env := &Env{Kv: make(map[string]string), Keys: make([]string, 0)}
-	env.Parser(data)
-	log.Printf("Loading environment values from %v:", filenames[0])
-	log.Println(env)
-	for key, value := range env.Kv {
-		err := os.Setenv(key, value)
+	var data []byte
+	var notExistFiles []string
+	for _, filename := range filenames {
+		temp, err := os.ReadFile(filename)
 		if err != nil {
-			return err
+			log.Println("[env] Error: ", err)
+			notExistFiles = append(notExistFiles, filename)
+		}
+		data = append(data, temp...)
+	}
+	filenames = filter(filenames, func(filename string) bool {
+		return !strings.Contains(strings.Join(notExistFiles, ","), filename)
+	})
+	if len(data) > 0 {
+		env := &Env{Kv: make(map[string]string), Keys: make([]string, 0)}
+		env.Parser(data)
+		log.Printf("[env] Loading environment values from %v:", filenames)
+		log.Println("[env]", env)
+		for key, value := range env.Kv {
+			err := os.Setenv(key, value)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
